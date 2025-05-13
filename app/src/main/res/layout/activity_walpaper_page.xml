@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- EditText for Search -->
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search for photos"
+        android:inputType="text" />
+
+    <!-- RecyclerView to display photos -->
+    <TextView
+        android:id="@+id/kullanici_goruntule"
+        android:layout_width="match_parent"
+        android:layout_height="39dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/photosRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="686dp"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

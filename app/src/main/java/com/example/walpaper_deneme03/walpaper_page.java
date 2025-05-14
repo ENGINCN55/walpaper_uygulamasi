@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,6 +53,7 @@ public class walpaper_page extends AppCompatActivity {
     private RecyclerView recyclerView;
     private PhotoAdapter photoAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,15 +66,23 @@ public class walpaper_page extends AppCompatActivity {
         photoAdapter = new PhotoAdapter();
         recyclerView.setAdapter(photoAdapter);
 
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+
+        searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void afterTextChanged(Editable editable) {
-                String query = editable.toString().trim();
-                if (!query.isEmpty()) fetchPhotos(query);
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Enter tuşuna basıldığında veya 'done' işareti verildiğinde tetiklenir
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String query = v.getText().toString().replaceAll("\\s+", ""); // boşlukları sil
+                    if (!query.isEmpty()) {
+                        fetchPhotos(query); // API'ye yollanacak veri
+                    }
+                    return true; // işlem tamamlandı
+                }
+                return false;
             }
         });
+
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -77,6 +95,14 @@ public class walpaper_page extends AppCompatActivity {
 
                 if (direction == ItemTouchHelper.LEFT) {
                     downloadImageAndSaveAsJpg(photoUrl);
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null && user.isEmailVerified()) {
+                        saveFavoriteImageToFirebase(photoUrl);
+                    } else {
+                        Toast.makeText(walpaper_page.this, "user null geliyo", Toast.LENGTH_SHORT).show();
+                    }
+
+
                 } else if (direction == ItemTouchHelper.RIGHT) {
                     showWallpaperDialog(photoUrl);
                 }
@@ -87,6 +113,16 @@ public class walpaper_page extends AppCompatActivity {
 
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(walpaper_page.this, FavoritesActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+
+
 
     private void showWallpaperDialog(String imageUrl) {
         new AlertDialog.Builder(this)
@@ -117,6 +153,38 @@ public class walpaper_page extends AppCompatActivity {
                     @Override public void onLoadCleared(@Nullable Drawable placeholder) {}
                 });
     }
+    private void saveFavoriteImageToFirebase(String imageUrl) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userFavoritesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("favorites");
+
+        // Önce, bu görselin zaten eklenip eklenmediğini kontrol et
+        userFavoritesRef.orderByValue().equalTo(imageUrl).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Eğer URL zaten varsa, kullanıcıyı bilgilendir
+                    Toast.makeText(walpaper_page.this, "Bu görsel zaten favorilerinde!", Toast.LENGTH_SHORT).show();
+                } else {
+                    String imageId = "fav_" + System.currentTimeMillis();
+                    userFavoritesRef.child(imageId).setValue(imageUrl)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(walpaper_page.this, "Favorilere eklendi!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(walpaper_page.this, "Favoriye eklerken bir hata oluştu", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(walpaper_page.this, "Veri alınamadı!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     private void downloadImageAndSaveAsJpg(String imageUrl) {
         Glide.with(this)

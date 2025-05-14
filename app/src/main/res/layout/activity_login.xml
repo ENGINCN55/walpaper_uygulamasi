@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+    <Button
+        android:id="@+id/btnkayit_ol"
+        android:layout_width="124dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="62dp"
+        android:layout_marginTop="105dp"
+        android:layout_marginEnd="47dp"
+        android:layout_marginBottom="280dp"
+        android:text="Kayıt ol"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnGiris_yap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sifre"
+        tools:visibility="invisible" />
+
+    <Button
+        android:id="@+id/btnGiris_yap"
+        android:layout_width="124dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="47dp"
+        android:layout_marginTop="105dp"
+        android:layout_marginEnd="54dp"
+        android:layout_marginBottom="280dp"
+        android:text="Giriş Yap"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnkayit_ol"
+        app:layout_constraintTop_toBottomOf="@+id/sifre" />
+
+    <EditText
+        android:id="@+id/kullanici_adi"
+        android:layout_width="375dp"
+        android:layout_height="38dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="10dp"
+
+        android:layout_marginBottom="64dp"
+        android:ems="10"
+        android:inputType="text"
+        android:padding="10dp"
+        android:paddingLeft="10dp"
+        android:text="Kullanıcı adı"
+        app:layout_constraintBottom_toTopOf="@+id/sifre"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/sifre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="10dp"
+        android:ems="10"
+        android:inputType="text"
+        android:paddingLeft="10dp"
+        android:text="Şifre"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/kullanici_adi" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

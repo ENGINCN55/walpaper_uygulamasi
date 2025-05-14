@@ -1,8 +1,10 @@
 package com.example.walpaper_deneme03;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedDispatcher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -21,4 +23,13 @@ public class ayarlar extends AppCompatActivity {
             return insets;
         });
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ayarlar.this, FavoritesActivity.class);
+        startActivity(intent);
+        finish();
+
+    }
+
 }

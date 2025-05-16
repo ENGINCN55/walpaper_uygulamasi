@@ -57,6 +57,10 @@ public class FavoritesActivity extends AppCompatActivity {
                 startActivity(new Intent(FavoritesActivity.this, ayarlar.class));
                 finish();
                 return true;
+            } else if (item.getItemId() == R.id.nav_walpapernet) {  // Walaper Net) {
+                startActivity(new Intent(FavoritesActivity.this, WallpaperNetActivity.class));
+                finish();
+                return true;
             }
             return false;
         });

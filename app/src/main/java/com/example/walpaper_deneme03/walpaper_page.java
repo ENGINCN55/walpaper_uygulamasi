@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +34,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
@@ -40,6 +44,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +72,7 @@ public class walpaper_page extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoAdapter = new PhotoAdapter();
         recyclerView.setAdapter(photoAdapter);
+        //setupLongClickListener();
 
 
 
@@ -112,6 +120,71 @@ public class walpaper_page extends AppCompatActivity {
         };
 
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
+
+        photoAdapter.setOnItemLongClickListener(new PhotoAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(String photoUrl) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) {
+                    Toast.makeText(walpaper_page.this, "Giriş yapmamışsın knk!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String userId = user.getUid();
+                String photoKey = Base64.encodeToString(photoUrl.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+
+                DatabaseReference likesRef = FirebaseDatabase.getInstance()
+                        .getReference("Likes")
+                        .child(userId);
+
+                DatabaseReference photoLikesRef = FirebaseDatabase.getInstance()
+                        .getReference("photoLikes")
+                        .child(photoKey);
+
+                likesRef.child(photoKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            // Kullanıcıya özel like'ı kaydet
+                            likesRef.child(photoKey).setValue(true);
+
+                            // Genel like sayısını arttır ve URL'yi kaydet (ilk kez ise)
+                            photoLikesRef.runTransaction(new Transaction.Handler() {
+                                @NonNull
+                                @Override
+                                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                    Integer currentValue = null;
+                                    if (currentData.hasChild("likeCount"))
+                                        currentValue = currentData.child("likeCount").getValue(Integer.class);
+
+                                    if (currentValue == null) {
+                                        currentData.child("likeCount").setValue(1);
+                                        currentData.child("url").setValue(photoUrl);  // Burada URL ekleniyor
+                                    } else {
+                                        currentData.child("likeCount").setValue(currentValue + 1);
+                                    }
+                                    return Transaction.success(currentData);
+                                }
+
+                                @Override
+                                public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                                    if (committed) {
+                                        Toast.makeText(walpaper_page.this, "Beğenildi 😎", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(walpaper_page.this, "Bi' hata oldu knk...", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        } else {
+                            Toast.makeText(walpaper_page.this, "Zaten beğenmişsin moruk 😅", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+        });
     }
     @Override
     public void onBackPressed() {
@@ -183,6 +256,13 @@ public class walpaper_page extends AppCompatActivity {
             }
         });
     }
+    /*private void setupLongClickListener(){
+
+    }*/
+
+
+
+
 
 
 
@@ -190,25 +270,34 @@ public class walpaper_page extends AppCompatActivity {
         Glide.with(this)
                 .asBitmap()
                 .load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Favoriler");
                         if (!directory.exists()) directory.mkdirs();
 
-                        File file = new File(directory, "fav_" + System.currentTimeMillis() + ".jpg");
+                        // Aynı görsel için aynı isim
+                        String fileName = "fav_" + imageUrl.replaceAll("[^a-zA-Z0-9.-]", "_") + ".jpg";
+                        File file = new File(directory, fileName);
+
+                        if (file.exists()) {
+                            Toast.makeText(walpaper_page.this, "Zaten favorilerdesin moruk 🤌", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
                         try (FileOutputStream out = new FileOutputStream(file)) {
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, out);
                             out.flush();
-                            Toast.makeText(walpaper_page.this, "Favorilere kaydettim moruk", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, "Favorilere kaydettim moruk 📥", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
                             Toast.makeText(walpaper_page.this, "Kaydederken çuvalladık aq", Toast.LENGTH_SHORT).show();
                         }
                     }
 
-                    @Override public void onLoadCleared(@Nullable Drawable placeholder) {}
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
                 });
     }
 
@@ -247,5 +336,15 @@ public class walpaper_page extends AppCompatActivity {
                 }
             }
         });
+    }
+    public String Base64(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
+            // Hex string yapmaya çalışma, direkt Base64 encode et
+            return Base64.encodeToString(hash, Base64.NO_WRAP); // NO_WRAP: satır bölme yok
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

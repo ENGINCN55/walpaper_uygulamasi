@@ -37,6 +37,16 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         Glide.with(holder.itemView.getContext())
                 .load(photoUrl)
                 .into(holder.imageView);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (longClickListener != null) {
+                    longClickListener.onItemLongClick(photoUrl);
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
 
@@ -60,6 +70,15 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
         }
+    }
+    public interface OnItemLongClickListener {
+        void onItemLongClick(String photoUrl);
+    }
+
+    private OnItemLongClickListener longClickListener;
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
     }
 
 }

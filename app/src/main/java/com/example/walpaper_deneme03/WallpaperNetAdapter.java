@@ -23,9 +23,14 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
     private Context context;
     private List<String> imageUrls;
     private OnItemLongClickListener longClickListener;
+    public OnItemSwipeListener swipeListener;
 
     public interface OnItemLongClickListener {
         void onItemLongClick(int position);
+    }
+
+    public interface OnItemSwipeListener {
+        void onItemSwiped(int position);
     }
 
     public WallpaperNetAdapter(Context context, List<String> imageUrls) {
@@ -35,6 +40,10 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
 
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.longClickListener = listener;
+    }
+
+    public void setOnItemSwipeListener(OnItemSwipeListener listener) {
+        this.swipeListener = listener;
     }
 
     @NonNull

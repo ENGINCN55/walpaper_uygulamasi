@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1031379591359",
+    "firebase_url": "https://walpaper-deneme03-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "walpaper-deneme03",
+    "storage_bucket": "walpaper-deneme03.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031379591359:android:086c174dd66ccbc685e60a",
+        "android_client_info": {
+          "package_name": "com.example.walpaper_deneme03"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0bIr7CIZDoeGUqTv3BAnyO55foPt48Ss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

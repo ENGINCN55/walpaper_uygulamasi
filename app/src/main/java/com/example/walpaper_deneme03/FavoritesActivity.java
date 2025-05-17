@@ -69,7 +69,7 @@ public class FavoritesActivity extends AppCompatActivity {
 
 
     private List<File> getFavoriteImages() {
-        File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Favoriler");
+        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyWallpapers");
         if (!directory.exists() || !directory.isDirectory()) return new ArrayList<>();
 
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"));

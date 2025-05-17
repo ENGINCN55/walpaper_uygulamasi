@@ -1,7 +1,11 @@
 package com.example.walpaper_deneme03;
 
+import android.Manifest;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -20,6 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,12 +65,16 @@ public class walpaper_page extends AppCompatActivity {
     private EditText searchEditText;
     private RecyclerView recyclerView;
     private PhotoAdapter photoAdapter;
-
+    private static final int STORAGE_PERMISSION_CODE = 100;
+    private PermissionUtil permissionUtil;
+    private String pendingPhotoUrlForFavorite = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_walpaper_page);
+
+        permissionUtil = new PermissionUtil();
 
         searchEditText = findViewById(R.id.searchEditText);
         recyclerView = findViewById(R.id.photosRecyclerView);
@@ -72,49 +82,43 @@ public class walpaper_page extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoAdapter = new PhotoAdapter();
         recyclerView.setAdapter(photoAdapter);
-        //setupLongClickListener();
-
-
 
         searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                // Enter tuşuna basıldığında veya 'done' işareti verildiğinde tetiklenir
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String query = v.getText().toString().replaceAll("\\s+", ""); // boşlukları sil
+                    String query = v.getText().toString().replaceAll("\\s+", "");
                     if (!query.isEmpty()) {
-                        fetchPhotos(query); // API'ye yollanacak veri
+                        fetchPhotos(query);
                     }
-                    return true; // işlem tamamlandı
+                    return true;
                 }
                 return false;
             }
         });
 
-
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) { return false; }
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 String photoUrl = photoAdapter.getPhotoAt(position);
-
                 if (direction == ItemTouchHelper.LEFT) {
                     downloadImageAndSaveAsJpg(photoUrl);
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null && user.isEmailVerified()) {
-                        saveFavoriteImageToFirebase(photoUrl);
+                        checkAndRequestStoragePermission(photoUrl);
                     } else {
-                        Toast.makeText(walpaper_page.this, "user null geliyo", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(walpaper_page.this, "Giriş yapmalısın moruk!", Toast.LENGTH_SHORT).show();
                     }
-
-
                 } else if (direction == ItemTouchHelper.RIGHT) {
                     showWallpaperDialog(photoUrl);
                 }
-
                 photoAdapter.notifyItemChanged(position);
             }
         };
@@ -145,10 +149,8 @@ public class walpaper_page extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (!snapshot.exists()) {
-                            // Kullanıcıya özel like'ı kaydet
                             likesRef.child(photoKey).setValue(true);
 
-                            // Genel like sayısını arttır ve URL'yi kaydet (ilk kez ise)
                             photoLikesRef.runTransaction(new Transaction.Handler() {
                                 @NonNull
                                 @Override
@@ -159,7 +161,7 @@ public class walpaper_page extends AppCompatActivity {
 
                                     if (currentValue == null) {
                                         currentData.child("likeCount").setValue(1);
-                                        currentData.child("url").setValue(photoUrl);  // Burada URL ekleniyor
+                                        currentData.child("url").setValue(photoUrl);
                                     } else {
                                         currentData.child("likeCount").setValue(currentValue + 1);
                                     }
@@ -186,6 +188,56 @@ public class walpaper_page extends AppCompatActivity {
             }
         });
     }
+
+    private void checkAndRequestStoragePermission(String photoUrl) {
+        if (permissionUtil.isPermissionGranted(this)) {
+            saveFavoriteImageToFirebase(photoUrl);
+        } else {
+            pendingPhotoUrlForFavorite = photoUrl;
+            showStoragePermissionDialog();
+        }
+    }
+
+    private void showStoragePermissionDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Depolama Erişim İzni")
+                .setMessage("Uygulamanın resimleri indirebilmesi için depolama erişim izni gerekiyor. İzin vermek ister misiniz?")
+                .setPositiveButton("Evet", (dialog, which) -> {
+                    permissionUtil.setPermissionGranted(walpaper_page.this, true);
+                    Toast.makeText(walpaper_page.this, "Depolama izni verildi", Toast.LENGTH_SHORT).show();
+
+                    if (pendingPhotoUrlForFavorite != null) {
+                        saveFavoriteImageToFirebase(pendingPhotoUrlForFavorite);
+                        pendingPhotoUrlForFavorite = null;
+                    }
+                })
+                .setNegativeButton("Hayır", (dialog, which) -> {
+                    permissionUtil.setPermissionGranted(walpaper_page.this, false);
+                    Toast.makeText(walpaper_page.this, "Depolama izni verilmedi", Toast.LENGTH_SHORT).show();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                permissionUtil.setPermissionGranted(this, true);
+                Toast.makeText(this, "İzin verildi, artık favori ekleyebilirsin!", Toast.LENGTH_SHORT).show();
+                if (pendingPhotoUrlForFavorite != null) {
+                    saveFavoriteImageToFirebase(pendingPhotoUrlForFavorite);
+                    pendingPhotoUrlForFavorite = null;
+                }
+            } else {
+                permissionUtil.setPermissionGranted(this, false);
+                Toast.makeText(this, "İzin vermediğin sürece favorilere ekleyemezsin!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -194,8 +246,25 @@ public class walpaper_page extends AppCompatActivity {
         finish();
     }
 
+    public class PermissionUtil {
+        private static final String PREFS_NAME = "app_prefs";
+        private static final String KEY_PERMISSION_GRANTED = "storage_permission_granted";
 
+        public void setPermissionGranted(Context context, boolean granted) {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            prefs.edit().putBoolean(KEY_PERMISSION_GRANTED, granted).apply();
+        }
 
+        public boolean isPermissionGranted(Context context) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            }
+
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            return prefs.getBoolean(KEY_PERMISSION_GRANTED, false);
+        }
+    }
 
     private void showWallpaperDialog(String imageUrl) {
         new AlertDialog.Builder(this)
@@ -226,16 +295,15 @@ public class walpaper_page extends AppCompatActivity {
                     @Override public void onLoadCleared(@Nullable Drawable placeholder) {}
                 });
     }
+
     private void saveFavoriteImageToFirebase(String imageUrl) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference userFavoritesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("favorites");
 
-        // Önce, bu görselin zaten eklenip eklenmediğini kontrol et
         userFavoritesRef.orderByValue().equalTo(imageUrl).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Eğer URL zaten varsa, kullanıcıyı bilgilendir
                     Toast.makeText(walpaper_page.this, "Bu görsel zaten favorilerinde!", Toast.LENGTH_SHORT).show();
                 } else {
                     String imageId = "fav_" + System.currentTimeMillis();
@@ -256,17 +324,13 @@ public class walpaper_page extends AppCompatActivity {
             }
         });
     }
-    /*private void setupLongClickListener(){
-
-    }*/
-
-
-
-
-
-
 
     private void downloadImageAndSaveAsJpg(String imageUrl) {
+        if (!permissionUtil.isPermissionGranted(this)) {
+            Toast.makeText(this, "İndirmek için depolama izni gerekli!", Toast.LENGTH_SHORT).show();
+            return;
+        }else {
+
         Glide.with(this)
                 .asBitmap()
                 .load(imageUrl)
@@ -274,31 +338,34 @@ public class walpaper_page extends AppCompatActivity {
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        File directory = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Favoriler");
-                        if (!directory.exists()) directory.mkdirs();
+                        try {
+                            File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyWallpapers");
+                            if (!directory.exists()) {
+                                directory.mkdirs();
+                            }
 
-                        // Aynı görsel için aynı isim
-                        String fileName = "fav_" + imageUrl.replaceAll("[^a-zA-Z0-9.-]", "_") + ".jpg";
-                        File file = new File(directory, fileName);
-
-                        if (file.exists()) {
-                            Toast.makeText(walpaper_page.this, "Zaten favorilerdesin moruk 🤌", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        try (FileOutputStream out = new FileOutputStream(file)) {
+                            String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+                            File file = new File(directory, fileName);
+                            FileOutputStream out = new FileOutputStream(file);
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, out);
                             out.flush();
-                            Toast.makeText(walpaper_page.this, "Favorilere kaydettim moruk 📥", Toast.LENGTH_SHORT).show();
+                            out.close();
+
+                            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                            mediaScanIntent.setData(Uri.fromFile(file));
+                            sendBroadcast(mediaScanIntent);
+
+                            Toast.makeText(walpaper_page.this, "Görsel indirildi moruk 📥", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(walpaper_page.this, "Kaydederken çuvalladık aq", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, "İndirme sırasında hata oldu aq 😓", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onLoadCleared(@Nullable Drawable placeholder) {}
-                });
+                });}
+
     }
 
     private void fetchPhotos(final String query) {
@@ -312,11 +379,13 @@ public class walpaper_page extends AppCompatActivity {
                 .build();
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override public void onFailure(okhttp3.Call call, IOException e) {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
                 runOnUiThread(() -> Toast.makeText(walpaper_page.this, "API patladı moruk", Toast.LENGTH_SHORT).show());
             }
 
-            @Override public void onResponse(okhttp3.Call call, Response response) throws IOException {
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     try {
                         JSONObject jsonResponse = new JSONObject(response.body().string());
@@ -337,12 +406,12 @@ public class walpaper_page extends AppCompatActivity {
             }
         });
     }
+
     public String Base64(String base) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
-            // Hex string yapmaya çalışma, direkt Base64 encode et
-            return Base64.encodeToString(hash, Base64.NO_WRAP); // NO_WRAP: satır bölme yok
+            return Base64.encodeToString(hash, Base64.NO_WRAP);
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         }

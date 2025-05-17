@@ -1,7 +1,6 @@
 package com.example.walpaper_deneme03;
 
 import android.content.Context;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
 
     @Override
     public void onBindViewHolder(@NonNull PhotoViewHolder holder, int position) {
-        String realUrl = imageUrls.get(position); // Artık encoded değil!
+        String realUrl = imageUrls.get(position);
         Glide.with(context)
                 .load(realUrl)
                 .into(holder.imageView);
@@ -74,6 +72,7 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
             });
         }
     }
+
     public void updatePhotos(List<String> newPhotoUrls) {
         this.imageUrls = newPhotoUrls;
         notifyDataSetChanged();
@@ -96,7 +95,7 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Hata durumu handle edilebilir burada
+                // error handling burada yapılabilir
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.example.walpaper_deneme03;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,12 +15,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Bitmap;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -62,17 +61,16 @@ public class WallpaperNetActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         likesRef = FirebaseDatabase.getInstance().getReference("likes");
 
-        // Firebase'den beğenilen fotoğrafları çek
         fetchLikedImages();
         adapter.fetchPhotosFromFirebase();
 
         adapter.setOnItemLongClickListener(position -> {
-            String photoUrl = likedImageUrls.get(position);
-            likeImage(photoUrl);
+            String photoId = likedImageUrls.get(position);
+            likeImage(photoId);
         });
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT) {
+                ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -81,16 +79,40 @@ public class WallpaperNetActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                String photoUrl = likedImageUrls.get(position);
-                downloadImageAndSaveAsJpg(photoUrl);
-                saveFavoriteImageToFirebase(photoUrl);
+                String photoId = likedImageUrls.get(position);
+
+                // photoId'den url çek ve indir
+                DatabaseReference photoUrlRef = FirebaseDatabase.getInstance()
+                        .getReference("photoLikes")
+                        .child(photoId)
+                        .child("url");
+
+                photoUrlRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String imageUrl = snapshot.getValue(String.class);
+                            downloadImageAndSaveAsJpg(imageUrl);
+                        } else {
+                            Toast.makeText(WallpaperNetActivity.this, "URL bulunamadı aq", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("WallpaperNet", "Firebase hata: " + error.getMessage());
+                    }
+                });
+
+                // Itemi resetle yoksa görünüm kayar
                 adapter.notifyItemChanged(position);
-                likedImageUrls.remove(position);
             }
         };
 
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
     }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(WallpaperNetActivity.this, FavoritesActivity.class);
@@ -107,7 +129,7 @@ public class WallpaperNetActivity extends AppCompatActivity {
                     String url = child.getKey();
                     likedImageUrls.add(url);
                 }
-                Collections.reverse(likedImageUrls); // En çok beğenileni üste al
+                Collections.reverse(likedImageUrls);
                 adapter.notifyDataSetChanged();
             }
 
@@ -118,8 +140,8 @@ public class WallpaperNetActivity extends AppCompatActivity {
         });
     }
 
-    private void likeImage(String photoUrl) {
-        likesRef.child(photoUrl).runTransaction(new Transaction.Handler() {
+    private void likeImage(String photoId) {
+        likesRef.child(photoId).runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
@@ -142,7 +164,7 @@ public class WallpaperNetActivity extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot snapshot) {
                 if (committed) {
-                    Toast.makeText(WallpaperNetActivity.this, "Beğendin moruk ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WallpaperNetActivity.this, "Beğendin moruk 👍", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -162,24 +184,14 @@ public class WallpaperNetActivity extends AppCompatActivity {
                         File file = new File(directory, "fav_" + System.currentTimeMillis() + ".jpg");
                         try (FileOutputStream out = new FileOutputStream(file)) {
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                            Toast.makeText(WallpaperNetActivity.this, "Favorilere aldım moruk 📥", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WallpaperNetActivity.this, "İndirdim moruk 📥", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(WallpaperNetActivity.this, "İndirme error aq", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WallpaperNetActivity.this, "Sıkıntı çıktı aq", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override public void onLoadCleared(@Nullable Drawable placeholder) {}
                 });
-    }
-
-    private void saveFavoriteImageToFirebase(String imageUrl) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null && user.isEmailVerified()) {
-            DatabaseReference favRef = FirebaseDatabase.getInstance()
-                    .getReference("favorites")
-                    .child(user.getUid());
-            favRef.push().setValue(imageUrl);
-        }
     }
 }

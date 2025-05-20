@@ -34,7 +34,7 @@ public class FavoritesActivity extends AppCompatActivity {
         favoriteImages = getFavoriteImages();
 
         if (favoriteImages.isEmpty()) {
-            Toast.makeText(this, "Hiç favori kaydetmemişsin moruk!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_favorites, Toast.LENGTH_SHORT).show();
         }
 
         adapter = new FavoritesAdapter(this, favoriteImages);

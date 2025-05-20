@@ -151,9 +151,9 @@ public class WallpaperNetActivity extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
                 if (committed) {
-                    Toast.makeText(WallpaperNetActivity.this, "Beğenildi 😎", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WallpaperNetActivity.this, R.string.liked, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(WallpaperNetActivity.this, "Bi' hata oldu knk...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WallpaperNetActivity.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -164,15 +164,15 @@ public class WallpaperNetActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Toast.makeText(WallpaperNetActivity.this, "Bu görsel zaten favorilerinde!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WallpaperNetActivity.this, R.string.already_favorites, Toast.LENGTH_SHORT).show();
                 } else {
                     String imageId = "fav_" + System.currentTimeMillis();
                     userFavoritesRef.child(imageId).setValue(imageUrl)
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(WallpaperNetActivity.this, "Favorilere eklendi!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(WallpaperNetActivity.this, R.string.get_favorites, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(WallpaperNetActivity.this, "Favoriye eklerken bir hata oluştu", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(WallpaperNetActivity.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                                 }
                             });
                 }
@@ -180,7 +180,7 @@ public class WallpaperNetActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(WallpaperNetActivity.this, "Veri alınamadı!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WallpaperNetActivity.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -199,10 +199,10 @@ public class WallpaperNetActivity extends AppCompatActivity {
                         File file = new File(directory, "wallpaper_" + System.currentTimeMillis() + ".jpg");
                         try (FileOutputStream out = new FileOutputStream(file)) {
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                            Toast.makeText(WallpaperNetActivity.this, "Duvar kağıdı kaydedildi!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WallpaperNetActivity.this, R.string.get_walpaper, Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(WallpaperNetActivity.this, "Kaydetme hatası!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WallpaperNetActivity.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                         }
                     }
 

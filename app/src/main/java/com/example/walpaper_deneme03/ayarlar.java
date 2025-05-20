@@ -62,7 +62,7 @@ public class ayarlar extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(ayarlar.this, "Hiç favorin yok moruk!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ayarlar.this, R.string.no_favorites, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -73,12 +73,12 @@ public class ayarlar extends AppCompatActivity {
                     }
                 }
 
-                Toast.makeText(ayarlar.this, "İndirme başladı kral 👑", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ayarlar.this, R.string.download_starded, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ayarlar.this, "Firebase hatası aq: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ayarlar.this, R.string.someting_happened + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -122,7 +122,7 @@ public class ayarlar extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Kaydederken patladı mk!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
         }
     }
 

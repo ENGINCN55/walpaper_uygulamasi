@@ -55,10 +55,10 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavV
     private void showWallpaperDialog(File imageFile) {
         // Burada görseli duvar kağıdı olarak ayarlama işlemi yapılacak.
         new androidx.appcompat.app.AlertDialog.Builder(context)
-                .setTitle("Duvar Kağıdı Olarak Ayarla")
-                .setMessage("Bu görseli duvar kağıdı olarak ayarlamak istiyor musun moruk?")
-                .setPositiveButton("Evet", (dialog, which) -> setWallpaper(imageFile))
-                .setNegativeButton("Hayır", null)
+                .setTitle(R.string.makeit_walpaper)
+                .setMessage(R.string.do_you_wanna_make_walpaper)
+                .setPositiveButton(R.string.yes, (dialog, which) -> setWallpaper(imageFile))
+                .setNegativeButton(R.string.no, null)
                 .show();
     }
 
@@ -72,10 +72,10 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavV
                         try {
                             android.app.WallpaperManager wallpaperManager = android.app.WallpaperManager.getInstance(context);
                             wallpaperManager.setBitmap(resource);
-                            Toast.makeText(context, "Duvar kağıdın ayarlandı, kral!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, R.string.makeit_walpaper, Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Toast.makeText(context, "Duvar kağıdı ayarlanamadı aq", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                         }
                     }
 

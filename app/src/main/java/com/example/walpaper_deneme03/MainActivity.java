@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, FavoritesActivity.class));
         } else {
             // Kullanıcı yoksa veya mail doğrulanmamışsa login ekranına yolla
-            Toast.makeText(this, "Lütfen giriş yapın veya mailinizi doğrulayın", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.not_correct_email, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
 

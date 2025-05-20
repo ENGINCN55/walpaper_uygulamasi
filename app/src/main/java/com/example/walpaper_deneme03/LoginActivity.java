@@ -55,11 +55,11 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             if (user.isEmailVerified()) {
-                Toast.makeText(this, user.getEmail() + " giriş yaptı", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, user.getEmail() + R.string.logged_in, Toast.LENGTH_LONG).show();
                 startActivity(new Intent(this, FavoritesActivity.class));
                 finish();
             } else {
-                Toast.makeText(this, "Mailinizi doğrulayıp tekrar giriş yapın", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.not_correct_email, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(LoginActivity.this, "Doğrulama maili gönderildi.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(LoginActivity.this, R.string.should_correct_mail, Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                             updateUI(user);
                         } else {
                             Log.w(TAG, "Kayıt başarısız", task.getException());
-                            Toast.makeText(LoginActivity.this, "Kayıt başarısız", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, R.string.register_failed, Toast.LENGTH_LONG).show();
                             updateUI(null);
                         }
                     }
@@ -111,11 +111,11 @@ public class LoginActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                             } else {
-                                Toast.makeText(LoginActivity.this, "Mailinizi doğrulayıp tekrar giriş yapın", Toast.LENGTH_LONG).show();
+                                Toast.makeText(LoginActivity.this, R.string.not_correct_email, Toast.LENGTH_LONG).show();
                             }
                         } else {
                             Log.w(TAG, "Giriş başarısız", task.getException());
-                            Toast.makeText(LoginActivity.this, "Giriş başarısız", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -140,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 String email = kullanici_adi.getText().toString().trim();
                 if (!isMailValid(email)) {
-                    kullanici_adi.setError("Geçersiz mail adresi");
+                    kullanici_adi.setError(getString(R.string.invalid_username));
                     btnkayit_ol.setVisibility(View.INVISIBLE);
                 } else {
                     kullanici_adi.setError(null);
@@ -159,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
                 String password = s.toString().trim();
 
                 if (!isPasswordValid(password)) {
-                    sifre.setError("Şifre en az 8 karakter ve 1 özel karakter içermeli");
+                    sifre.setError(getString(R.string.invalid_password));
                     btnkayit_ol.setVisibility(View.INVISIBLE);
                 } else {
                     sifre.setError(null);

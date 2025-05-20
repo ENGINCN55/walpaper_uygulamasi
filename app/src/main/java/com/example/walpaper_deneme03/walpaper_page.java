@@ -114,7 +114,7 @@ public class walpaper_page extends AppCompatActivity {
                     if (user != null && user.isEmailVerified()) {
                         checkAndRequestStoragePermission(photoUrl);
                     } else {
-                        Toast.makeText(walpaper_page.this, "Giriş yapmalısın moruk!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(walpaper_page.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
                     }
                 } else if (direction == ItemTouchHelper.RIGHT) {
                     showWallpaperDialog(photoUrl);
@@ -130,7 +130,7 @@ public class walpaper_page extends AppCompatActivity {
             public void onItemLongClick(String photoUrl) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user == null) {
-                    Toast.makeText(walpaper_page.this, "Giriş yapmamışsın knk!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(walpaper_page.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -171,14 +171,14 @@ public class walpaper_page extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
                                     if (committed) {
-                                        Toast.makeText(walpaper_page.this, "Beğenildi 😎", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(walpaper_page.this, R.string.liked, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(walpaper_page.this, "Bi' hata oldu knk...", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                         } else {
-                            Toast.makeText(walpaper_page.this, "Zaten beğenmişsin moruk 😅", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, R.string.already_like, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -200,20 +200,20 @@ public class walpaper_page extends AppCompatActivity {
 
     private void showStoragePermissionDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Depolama Erişim İzni")
-                .setMessage("Uygulamanın resimleri indirebilmesi için depolama erişim izni gerekiyor. İzin vermek ister misiniz?")
-                .setPositiveButton("Evet", (dialog, which) -> {
+                .setTitle(R.string.storage_permission_granted)
+                .setMessage(R.string.do_you_wanna_grant_storage_permission_granted)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
                     permissionUtil.setPermissionGranted(walpaper_page.this, true);
-                    Toast.makeText(walpaper_page.this, "Depolama izni verildi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(walpaper_page.this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
 
                     if (pendingPhotoUrlForFavorite != null) {
                         saveFavoriteImageToFirebase(pendingPhotoUrlForFavorite);
                         pendingPhotoUrlForFavorite = null;
                     }
                 })
-                .setNegativeButton("Hayır", (dialog, which) -> {
+                .setNegativeButton(R.string.no, (dialog, which) -> {
                     permissionUtil.setPermissionGranted(walpaper_page.this, false);
-                    Toast.makeText(walpaper_page.this, "Depolama izni verilmedi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(walpaper_page.this, R.string.permission_not_granted, Toast.LENGTH_SHORT).show();
                 })
                 .setCancelable(false)
                 .show();
@@ -226,14 +226,14 @@ public class walpaper_page extends AppCompatActivity {
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionUtil.setPermissionGranted(this, true);
-                Toast.makeText(this, "İzin verildi, artık favori ekleyebilirsin!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permission_already_granted, Toast.LENGTH_SHORT).show();
                 if (pendingPhotoUrlForFavorite != null) {
                     saveFavoriteImageToFirebase(pendingPhotoUrlForFavorite);
                     pendingPhotoUrlForFavorite = null;
                 }
             } else {
                 permissionUtil.setPermissionGranted(this, false);
-                Toast.makeText(this, "İzin vermediğin sürece favorilere ekleyemezsin!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -268,10 +268,10 @@ public class walpaper_page extends AppCompatActivity {
 
     private void showWallpaperDialog(String imageUrl) {
         new AlertDialog.Builder(this)
-                .setTitle("Duvar Kağıdı Olarak Ayarla")
-                .setMessage("Bu görseli duvar kağıdı olarak ayarlamak istiyor musun moruk?")
-                .setPositiveButton("Evet", (dialog, which) -> setWallpaper(imageUrl))
-                .setNegativeButton("Hayır", null)
+                .setTitle(R.string.makeit_walpaper)
+                .setMessage(R.string.do_you_wanna_make_walpaper)
+                .setPositiveButton(R.string.yes, (dialog, which) -> setWallpaper(imageUrl))
+                .setNegativeButton(R.string.no, null)
                 .show();
     }
 
@@ -285,10 +285,10 @@ public class walpaper_page extends AppCompatActivity {
                         try {
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(walpaper_page.this);
                             wallpaperManager.setBitmap(resource);
-                            Toast.makeText(walpaper_page.this, "Arka plan yapıldı kral!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, R.string.get_walpaper, Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(walpaper_page.this, "Duvar kağıdı ayarlanamadı aq", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -304,15 +304,15 @@ public class walpaper_page extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Toast.makeText(walpaper_page.this, "Bu görsel zaten favorilerinde!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(walpaper_page.this, R.string.already_favorites, Toast.LENGTH_SHORT).show();
                 } else {
                     String imageId = "fav_" + System.currentTimeMillis();
                     userFavoritesRef.child(imageId).setValue(imageUrl)
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(walpaper_page.this, "Favorilere eklendi!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(walpaper_page.this, R.string.get_favorites, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(walpaper_page.this, "Favoriye eklerken bir hata oluştu", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                                 }
                             });
                 }
@@ -320,14 +320,13 @@ public class walpaper_page extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(walpaper_page.this, "Veri alınamadı!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void downloadImageAndSaveAsJpg(String imageUrl) {
         if (!permissionUtil.isPermissionGranted(this)) {
-            Toast.makeText(this, "İndirmek için depolama izni gerekli!", Toast.LENGTH_SHORT).show();
             return;
         }else {
 
@@ -355,10 +354,10 @@ public class walpaper_page extends AppCompatActivity {
                             mediaScanIntent.setData(Uri.fromFile(file));
                             sendBroadcast(mediaScanIntent);
 
-                            Toast.makeText(walpaper_page.this, "Görsel indirildi moruk 📥", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, R.string.downloaded, Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(walpaper_page.this, "İndirme sırasında hata oldu aq 😓", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -381,7 +380,7 @@ public class walpaper_page extends AppCompatActivity {
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(walpaper_page.this, "API patladı moruk", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show());
             }
 
             @Override

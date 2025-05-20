@@ -1,13 +1,53 @@
 <resources>
-    <string name="app_name" translatable="false">walpaper_deneme03</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="giris_yapan_kullanici">"Hoş Geldin"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="app_name" translatable="false">Walpaper App</string>
+    <string name="title_activity_login" translatable="false">LoginActivity</string>
+    <string name="prompt_email" translatable="false">Email</string>
+    <string name="prompt_password" translatable="false">Password</string>
+    <string name="action_sign_in" translatable="false">Sign in</string>
+    <string name="action_sign_in_short" translatable="false">Register</string>
+    <string name="welcome" translatable="false">"Welcome !"</string>
+
+    <string name="Favories" translatable="false">Favorites</string>
+    <string name="Home" translatable="false">Home</string>
+    <string name="settings" translatable="false">Settings</string>
+
+    <string name="register" translatable="false">Register</string>
+    <string name="login" translatable="false">Login</string>
+
+
+    <string name="yes" translatable="false">"Yes"</string>
+    <string name="no" translatable="false">"No"</string>
+    <string name="logged_in" translatable="false">Logged in</string>
+    <string name="register_failed" translatable="false">Register fail</string>
+    <string name="giris_yapan_kullanici" translatable="false">"Welcome !"</string>
+    <string name="nav_wallpapernet" translatable="false">Wallpaper Net</string>
+    <string name="invalid_username" translatable="false">Not a valid username</string>
+    <string name="invalid_password" translatable="false">Password must be >8 characters</string>
+    <string name="not_correct_email" translatable="false">You should veryfy the mail</string>
+    <string name="should_correct_mail" translatable="false">Mail authentication is sent</string>
+    <string name="login_failed" translatable="false">"Login failed"</string>
+    <string name="already_like" translatable="false">"Already Like"</string>
+    <string name="liked" translatable="false">"Liked"</string>
+    <string name="someting_happened" translatable="false">"Something happaned"</string>
+    <string name="makeit_walpaper" translatable="false">"Set as Walpaper"</string>
+    <string name="do_you_wanna_make_walpaper" translatable="false">"Do you want a make walpaper"</string>
+    <string name="get_walpaper" translatable="false">Walpaper was done</string>
+    <string name="already_favorites" translatable="false">This images is already in your favorites</string>
+    <string name="get_favorites" translatable="false">This image is added to favorites</string>
+    <string name="url_cant_find" translatable="false">Url cant find</string>
+    <string name="downloaded" translatable="false">downloaded</string>
+    <string name="no_favorites" translatable="false">You dont have any favorites</string>
+    <string name="download_starded" translatable="false">Download Started</string>
+    <string name="storage_permission_granted" translatable="false">storage permission</string>
+    <string name="do_you_wanna_grant_storage_permission_granted" translatable="false">Do you want to grant storage permission?</string>
+    <string name="permission_granted" translatable="false">permission granted</string>
+    <string name="permission_not_granted" translatable="false">permission not granted</string>
+    <string name="permission_already_granted" translatable="false">permission already granted</string>
+
+
+
+
+
+
+
 </resources>

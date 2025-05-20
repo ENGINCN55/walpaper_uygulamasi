@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#ECECEC">
+    android:background="?android:attr/windowBackground">
 
     <TextView
         android:id="@+id/txtAyarlarTitle"
@@ -15,20 +15,21 @@
         android:textStyle="bold"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:textColor="?attr/colorOnBackground" />
 
     <Button
         android:id="@+id/btnDownloadFromCloud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Buluttan İndir"
-        android:backgroundTint="#6200EE"
-        android:textColor="#FFFFFF"
-        android:textAllCaps="false"
-        android:textSize="18sp"
         android:layout_below="@id/txtAyarlarTitle"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
+        android:backgroundTint="?attr/colorPrimary"
         android:padding="12dp"
-        android:layout_centerHorizontal="true" />
+        android:text="Buluttan İndir"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorPrimaryVariant"
+        android:textSize="24sp" />
 
 </RelativeLayout>

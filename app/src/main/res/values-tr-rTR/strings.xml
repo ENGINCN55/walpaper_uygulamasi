@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name" translatable="false">Duvar Kağıdı Uygulaması</string>
+    <string name="title_activity_login">Giriş Ekranı</string>
+    <string name="prompt_email">E-posta</string>
+    <string name="prompt_password">Şifre</string>
+    <string name="action_sign_in">Giriş Yap</string>
+    <string name="action_sign_in_short">Kayıt Ol</string>
+
+    <string name="Favories">Favoriler</string>
+    <string name="Home">Ana sayfa</string>
+    <string name="settings">Ayarlar</string>
+
+    <string name="register" translatable="false">Kayıt Ol</string>
+    <string name="login" translatable="false">Giriş Yap</string>
+
+    <string name="yes" translatable="false">"Evet"</string>
+    <string name="no" translatable="false">"Hayır"</string>
+    <string name="welcome">Hoş geldiniz!</string>
+    <string name="logged_in">Giriş yaptı</string>
+    <string name="giris_yapan_kullanici">Hoş geldin!</string>
+    <string name="nav_wallpapernet">Wallpaper Net</string>
+    <string name="not_correct_email" translatable="false">Maili doğrulamanız lazım</string>
+    <string name="invalid_username">Geçersiz kullanıcı adı</string>
+    <string name="should_correct_mail" translatable="false">Doğrulama maili gönderildi</string>
+    <string name="invalid_password">Şifre 8 karakterden uzun olmalı</string>
+    <string name="login_failed">Giriş başarısız</string>
+    <string name="already_like" translatable="false">"Zaten Beğenilmiş"</string>
+    <string name="liked" translatable="false">"Beğenildi"</string>
+    <string name="someting_happened" translatable="false">"Bir şeyler ters gitti"</string>
+    <string name="makeit_walpaper" translatable="false">"Arka plan görüntüsü olarak ayarla"</string>
+    <string name="do_you_wanna_make_walpaper" translatable="false">"Arka plan görüntüsü yapmak istiyor musun?"</string>
+    <string name="get_walpaper" translatable="false">Arka plan yapıldı</string>
+    <string name="already_favorites" translatable="false">Bu görsel zaten favorilerinde</string>
+    <string name="get_favorites" translatable="false">Favorilere eklendi</string>
+    <string name="url_cant_find" translatable="false">Url bulunamadı</string>
+    <string name="downloaded" translatable="false">İndirildi</string>
+    <string name="no_favorites" translatable="false">Herhangi bir favorin yok</string>
+    <string name="download_starded" translatable="false">İndirme başlado</string>
+    <string name="storage_permission_granted" translatable="false">Depolama izni </string>
+    <string name="do_you_wanna_grant_storage_permission_granted" translatable="false">Depolama iznini vermek istiyor musun?</string>
+    <string name="permission_granted" translatable="false">İzin verildi</string>
+    <string name="permission_not_granted" translatable="false">İzin verilmedi</string>
+    <string name="permission_already_granted" translatable="false">izin sağlandı artık favorilere alabilir</string>
+
+
+
+
+
+
+
+
+
+
+</resources>

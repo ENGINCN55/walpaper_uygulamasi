@@ -41,6 +41,7 @@
     <string name="permission_granted" translatable="false">İzin verildi</string>
     <string name="permission_not_granted" translatable="false">İzin verilmedi</string>
     <string name="permission_already_granted" translatable="false">izin sağlandı artık favorilere alabilir</string>
+    <string name="dowload_from_cloud" translatable="false">Buluttan İndir</string>
 
 
 

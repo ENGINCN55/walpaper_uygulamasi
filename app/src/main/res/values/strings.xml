@@ -43,6 +43,7 @@
     <string name="permission_granted" translatable="false">permission granted</string>
     <string name="permission_not_granted" translatable="false">permission not granted</string>
     <string name="permission_already_granted" translatable="false">permission already granted</string>
+    <string name="dowload_from_cloud" translatable="false">Download From Cloud</string>
 
 
 

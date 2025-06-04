@@ -109,7 +109,6 @@ public class walpaper_page extends AppCompatActivity {
                 int position = viewHolder.getAdapterPosition();
                 String photoUrl = photoAdapter.getPhotoAt(position);
                 if (direction == ItemTouchHelper.LEFT) {
-                    downloadImageAndSaveAsJpg(photoUrl);
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null && user.isEmailVerified()) {
                         checkAndRequestStoragePermission(photoUrl);
@@ -295,7 +294,6 @@ public class walpaper_page extends AppCompatActivity {
                     @Override public void onLoadCleared(@Nullable Drawable placeholder) {}
                 });
     }
-
     private void saveFavoriteImageToFirebase(String imageUrl) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference userFavoritesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("favorites");
@@ -310,6 +308,7 @@ public class walpaper_page extends AppCompatActivity {
                     userFavoritesRef.child(imageId).setValue(imageUrl)
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
+                                    downloadImageAndSaveAsJpg(imageUrl);
                                     Toast.makeText(walpaper_page.this, R.string.get_favorites, Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(walpaper_page.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();
@@ -366,6 +365,7 @@ public class walpaper_page extends AppCompatActivity {
                 });}
 
     }
+
 
     private void fetchPhotos(final String query) {
         String url = "https://api.pexels.com/v1/search?query=" + query + "&per_page=10&page=1";

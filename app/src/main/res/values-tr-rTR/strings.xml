@@ -20,7 +20,7 @@
     <string name="giris_yapan_kullanici">Hoş geldin!</string>
     <string name="nav_wallpapernet">Wallpaper Net</string>
     <string name="not_correct_email" translatable="false">Maili doğrulamanız lazım</string>
-    <string name="invalid_username">Geçersiz kullanıcı adı</string>
+    <string name="invalid_username">Geçersiz mail</string>
     <string name="should_correct_mail" translatable="false">Doğrulama maili gönderildi</string>
     <string name="invalid_password">Şifre 8 karakterden uzun olmalı</string>
     <string name="login_failed">Giriş başarısız</string>
@@ -42,14 +42,9 @@
     <string name="permission_not_granted" translatable="false">İzin verilmedi</string>
     <string name="permission_already_granted" translatable="false">izin sağlandı artık favorilere alabilir</string>
     <string name="dowload_from_cloud" translatable="false">Buluttan İndir</string>
-
-
-
-
-
-
-
-
+    <string name="forgot_pasword" translatable="false">Şifremi unuttum</string>
+    <string name="log_out" translatable="false">Logout</string>
+    <string name="enter_email">Lütfen mail alanını boş bırakmayın</string>
 
 
 </resources>

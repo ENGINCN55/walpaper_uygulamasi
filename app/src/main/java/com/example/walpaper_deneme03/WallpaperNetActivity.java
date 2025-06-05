@@ -62,18 +62,22 @@ public class WallpaperNetActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         likesRef = FirebaseDatabase.getInstance().getReference("likes").child(currentUser.getUid());
         userFavoritesRef = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("favorites");
-        fetchLikedImages();
-        adapter.fetchPhotosFromFirebase();
+        //fetchLikedImages();
+        fetchPhotosFromFirebase();
+
+
 
         adapter.setOnItemLongClickListener(position -> {
-            String imageUrl = likedImageUrls.get(position);
-            likeImage(imageUrl);
+            if (position >= 0 && position < likedImageUrls.size()) { // Güvenlik kontrolü
+                String imageUrl = likedImageUrls.get(position);
+                likeImage(imageUrl);
+            }
         });
 
         adapter.setOnItemSwipeListener(position -> {
             String imageUrl = likedImageUrls.get(position);
             saveFavoriteImageToFirebase(imageUrl);
-            downloadImageAndSaveToGallery(imageUrl);
+
         });
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
@@ -86,8 +90,10 @@ public class WallpaperNetActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                if (adapter.swipeListener != null) {
-                    adapter.swipeListener.onItemSwiped(position);
+                if (position >= 0 && position < likedImageUrls.size()) { // Güvenlik kontrolü
+                    if (adapter.swipeListener != null) {
+                        adapter.swipeListener.onItemSwiped(position);
+                    }
                 }
                 adapter.notifyItemChanged(position);
             }
@@ -158,6 +164,33 @@ public class WallpaperNetActivity extends AppCompatActivity {
             }
         });
     }
+    public void fetchPhotosFromFirebase() {
+        DatabaseReference photoLikesRef = FirebaseDatabase.getInstance().getReference("photoLikes");
+        photoLikesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> photoUrls = new ArrayList<>();
+                for (DataSnapshot photoSnapshot : snapshot.getChildren()) {
+                    String url = photoSnapshot.child("url").getValue(String.class);
+                    if (url != null) {
+                        photoUrls.add(url);
+                    }
+                }
+                updatePhotos(photoUrls);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // error handling burada yapılabilir
+            }
+        });
+    }
+    public void updatePhotos(List<String> newPhotoUrls) {
+        this.likedImageUrls = newPhotoUrls;
+        adapter.updatePhotos(newPhotoUrls);
+    }
+
+
 
     private void saveFavoriteImageToFirebase(String imageUrl) {
         userFavoritesRef.orderByValue().equalTo(imageUrl).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -170,6 +203,7 @@ public class WallpaperNetActivity extends AppCompatActivity {
                     userFavoritesRef.child(imageId).setValue(imageUrl)
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
+                                    downloadImageAndSaveToGallery(imageUrl);
                                     Toast.makeText(WallpaperNetActivity.this, R.string.get_favorites, Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(WallpaperNetActivity.this, R.string.someting_happened, Toast.LENGTH_SHORT).show();

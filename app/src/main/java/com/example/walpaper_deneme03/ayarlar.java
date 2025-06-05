@@ -29,7 +29,7 @@ import java.io.IOException;
 
 public class ayarlar extends AppCompatActivity {
 
-    private Button btnDownloadFromCloud;
+    private Button btnDownloadFromCloud, cilkis_yap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +48,19 @@ public class ayarlar extends AppCompatActivity {
 
     private void initUI() {
         btnDownloadFromCloud = findViewById(R.id.btnDownloadFromCloud); // xml'deki buton id'si bu olmalı
+        cilkis_yap = findViewById(R.id.cilkis_yap);
     }
 
     private void setupListeners() {
         btnDownloadFromCloud.setOnClickListener(v -> fetchFavoriteImagesAndDownload());
+        cilkis_yap.setOnClickListener(c->cikisYap());
     }
+    private void cikisYap() {
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(ayarlar.this, LoginActivity.class));
+        finish();
+    }
+
 
     private void fetchFavoriteImagesAndDownload() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();

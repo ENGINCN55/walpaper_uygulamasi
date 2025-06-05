@@ -61,6 +61,7 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
                 .into(holder.imageView);
     }
 
+
     @Override
     public int getItemCount() {
         return imageUrls.size();
@@ -87,25 +88,5 @@ public class WallpaperNetAdapter extends RecyclerView.Adapter<WallpaperNetAdapte
         notifyDataSetChanged();
     }
 
-    public void fetchPhotosFromFirebase() {
-        DatabaseReference photoLikesRef = FirebaseDatabase.getInstance().getReference("photoLikes");
-        photoLikesRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> photoUrls = new ArrayList<>();
-                for (DataSnapshot photoSnapshot : snapshot.getChildren()) {
-                    String url = photoSnapshot.child("url").getValue(String.class);
-                    if (url != null) {
-                        photoUrls.add(url);
-                    }
-                }
-                updatePhotos(photoUrls);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // error handling burada yapılabilir
-            }
-        });
-    }
 }

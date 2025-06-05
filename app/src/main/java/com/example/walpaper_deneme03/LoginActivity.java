@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private FirebaseAuth mAuth;
     private EditText sifre, kullanici_adi;
+    private TextView sifremi_unuttum;
     private Button btnGiris_yap, btnkayit_ol;
 
     @Override
@@ -42,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         sifre = findViewById(R.id.sifre);
         btnGiris_yap = findViewById(R.id.btnGiris_yap);
         btnkayit_ol = findViewById(R.id.btnkayit_ol);
+        sifremi_unuttum = findViewById(R.id.sifremi_unuttum);
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -95,6 +100,12 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
+        sifremi_unuttum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetPassword();
+            }
+        });
 
         btnGiris_yap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +132,30 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
+
+    }
+
+    private void resetPassword() {
+        String email = kullanici_adi.getText().toString().trim();
+        if (email.isEmpty()) {
+            kullanici_adi.setError(getString(R.string.enter_email));
+            return;
+        }
+        mAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(LoginActivity.this, R.string.should_correct_mail, Toast.LENGTH_LONG).show();
+                    }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(LoginActivity.this, R.string.someting_happened, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
     }
 
 

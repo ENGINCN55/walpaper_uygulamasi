@@ -44,11 +44,9 @@
     <string name="permission_not_granted" translatable="false">permission not granted</string>
     <string name="permission_already_granted" translatable="false">permission already granted</string>
     <string name="dowload_from_cloud" translatable="false">Download From Cloud</string>
-
-
-
-
-
+    <string name="forgot_pasword" translatable="false">Forgot my Password</string>
+    <string name="log_out" translatable="false">Logout</string>
+    <string name="enter_email">Please do not leave email notification blank</string>
 
 
 </resources>

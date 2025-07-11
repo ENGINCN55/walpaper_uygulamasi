@@ -112,6 +112,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String kullanici = kullanici_adi.getText().toString();
                 String sifresi = sifre.getText().toString();
+                if (kullanici.isEmpty() || sifresi.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, R.string.enter_email_and_password, Toast.LENGTH_LONG).show();
+                    return;
+                }
                 mAuth.signInWithEmailAndPassword(kullanici, sifresi).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {

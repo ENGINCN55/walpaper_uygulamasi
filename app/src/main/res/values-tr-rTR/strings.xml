@@ -45,6 +45,8 @@
     <string name="forgot_pasword" translatable="false">Şifremi unuttum</string>
     <string name="log_out" translatable="false">Logout</string>
     <string name="enter_email">Lütfen mail alanını boş bırakmayın</string>
+    <string name="enter_email_and_password">Lütfen mail ve şifre alanını boş bırakmayın</string>
+
 
 
 </resources>

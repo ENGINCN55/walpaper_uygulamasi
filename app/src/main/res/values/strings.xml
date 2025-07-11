@@ -47,6 +47,8 @@
     <string name="forgot_pasword" translatable="false">Forgot my Password</string>
     <string name="log_out" translatable="false">Logout</string>
     <string name="enter_email">Please do not leave email notification blank</string>
+    <string name="enter_email_and_password">Please do not leave the email and password fields blank.</string>
+
 
 
 </resources>
